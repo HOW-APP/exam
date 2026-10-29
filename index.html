@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《人工智能工具使用规范》培训考试</title>
+<style>
+  :root{
+    --ink:#1b1f24; --sub:#5b6673; --line:#e2e6ec; --bg:#f4f6f9;
+    --brand:#14539a; --brand-soft:#eaf1fa;
+    --ok:#12855b; --ok-soft:#e7f6ef; --bad:#c02b2b; --bad-soft:#fdecec;
+    --warn:#a86400; --warn-soft:#fff6e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.75; font-size:15px;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px 64px;}
+
+  /* 顶部 */
+  header.top{
+    background:linear-gradient(135deg,#14539a,#1f6fb8);color:#fff;
+    padding:26px 16px 22px;margin-bottom:18px;
+  }
+  header.top .inner{max-width:860px;margin:0 auto;}
+  header.top h1{font-size:22px;margin:0 0 10px;font-weight:700;letter-spacing:.02em;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;}
+  .meta span{
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
+    border-radius:999px;padding:3px 12px;font-size:12.5px;
+  }
+
+  /* 卡片 */
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 2px rgba(16,24,40,.04);}
+  .notice{background:var(--brand-soft);border:1px solid #cfe0f4;border-radius:12px;padding:16px 20px;margin-bottom:18px;font-size:14px;color:#20456f;}
+  .notice b{color:var(--brand);}
+  .notice ol{margin:8px 0 0;padding-left:20px;}
+  .notice li{margin:2px 0;}
+
+  /* 答题人信息 */
+  .who{display:flex;gap:12px;flex-wrap:wrap;}
+  .who label{flex:1 1 200px;font-size:13px;color:var(--sub);}
+  .who input{
+    width:100%;margin-top:5px;padding:9px 11px;border:1px solid var(--line);
+    border-radius:8px;font-size:14px;font-family:inherit;color:var(--ink);background:#fbfcfd;
+  }
+  .who input:focus{outline:2px solid #bcd6f2;border-color:#8fb8e2;background:#fff;}
+
+  /* 题目 */
+  .q{border-left:4px solid #d5dee9;}
+  .q .qhead{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
+  .q .no{
+    flex:0 0 auto;min-width:26px;height:26px;border-radius:7px;background:var(--brand);
+    color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  .q .tag{
+    flex:0 0 auto;font-size:11.5px;padding:1px 8px;border-radius:999px;
+    background:#eef1f6;color:var(--sub);margin-top:4px;
+  }
+  .q .stem{font-weight:600;font-size:15.5px;line-height:1.7;}
+  .opts{margin-top:4px;}
+  .opt{
+    display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);
+    border-radius:9px;margin-bottom:8px;cursor:pointer;background:#fcfdfe;transition:.14s;
+    font-size:14.5px;
+  }
+  .opt:hover{border-color:#a9c6e6;background:#f7fafd;}
+  .opt input{margin:5px 0 0;flex:0 0 auto;accent-color:var(--brand);width:16px;height:16px;cursor:pointer;}
+  .opt .lab{flex:0 0 auto;font-weight:700;color:var(--brand);min-width:16px;}
+  .opt.checked{border-color:#8fb8e2;background:#f2f7fd;}
+  .opt.right{border-color:#8fd4b6;background:var(--ok-soft);}
+  .opt.wrong{border-color:#efb4b4;background:var(--bad-soft);}
+
+  /* 结果 */
+  .result{display:none;}
+  .scorebox{text-align:center;padding:26px 20px;}
+  .scorebox .num{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+  .scorebox .num small{font-size:16px;font-weight:600;color:var(--sub);}
+  .badge{display:inline-block;margin-top:12px;padding:5px 18px;border-radius:999px;font-weight:700;font-size:14px;}
+  .badge.pass{background:var(--ok-soft);color:var(--ok);border:1px solid #a9dfc6;}
+  .badge.fail{background:var(--bad-soft);color:var(--bad);border:1px solid #f0b8b8;}
+  .breakdown{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--sub);}
+  .breakdown b{display:block;font-size:19px;color:var(--ink);}
+
+  .explain{margin-top:10px;font-size:13.5px;color:#33414f;background:#f7f9fc;border:1px dashed #d8e0ea;border-radius:9px;padding:11px 14px;}
+  .explain .k{color:var(--ok);font-weight:700;}
+  .explain .m{color:var(--bad);font-weight:700;}
+  .basis{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--brand);background:var(--brand-soft);border-radius:6px;padding:2px 9px;}
+  .judgeflag{display:inline-block;font-size:13px;font-weight:700;margin-right:10px;}
+  .judgeflag.ok{color:var(--ok);}
+  .judgeflag.no{color:var(--bad);}
+
+  /* 错题解析（分数下方） */
+  .wrongtitle{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .wrongtitle .cnt{background:var(--bad);color:#fff;border-radius:999px;padding:0 9px;font-size:12.5px;line-height:20px;font-weight:700;}
+  .wrongitem{border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:9px;padding:12px 14px;margin-bottom:12px;background:#fff;}
+  .wrongitem:last-child{margin-bottom:0;}
+  .wrongitem .qhead{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .wrongitem .qhead .qno{color:var(--bad);margin-right:6px;}
+  .wrongitem .ans{font-size:13px;color:var(--sub);margin-bottom:6px;}
+  .wrongitem .ans b.you{color:var(--bad);}
+  .wrongitem .ans b.ok{color:var(--ok);}
+  .wrongitem .ana{font-size:13px;color:#33414f;background:#f7f9fc;border-radius:6px;padding:8px 10px;margin-bottom:6px;}
+  .wrongitem .basis{margin-top:0;}
+  .allright{text-align:center;padding:22px 16px;color:var(--ok);font-size:15px;font-weight:700;}
+  .allright .ico{display:block;font-size:34px;margin-bottom:6px;}
+
+  /* 按钮 */
+  .actions{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(244,246,249,0),var(--bg) 40%);padding:18px 0 4px;display:flex;gap:12px;flex-wrap:wrap;}
+  button{font-family:inherit;font-size:15px;border-radius:9px;cursor:pointer;border:1px solid transparent;padding:12px 22px;font-weight:600;transition:.15s;}
+  .btn-main{background:var(--brand);color:#fff;box-shadow:0 2px 6px rgba(20,83,154,.22);flex:1 1 auto;}
+  .btn-main:hover{background:#0f447f;}
+  .btn-ghost{background:#fff;color:var(--brand);border-color:#bcd4ee;}
+  .btn-ghost:hover{background:#f2f7fd;}
+  .btn-sub{background:#fff;color:var(--sub);border-color:var(--line);font-size:13.5px;padding:9px 16px;}
+  .btn-sub:hover{background:#f7f9fc;}
+
+  .progressbar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#38a1f3,#14539a);width:0;z-index:99;transition:width .2s;}
+
+  .foot{text-align:center;color:#98a2b0;font-size:12px;margin-top:26px;line-height:2;}
+
+  @media (max-width:560px){
+    header.top h1{font-size:19px;}
+    .card{padding:16px 15px;}
+    .scorebox .num{font-size:44px;}
+    .breakdown{gap:16px;}
+  }
+  /* 打印：只留成绩单与错题 */
+  @media print{
+    body{background:#fff;}
+    header.top{background:#fff;color:#000;border-bottom:2px solid #000;}
+    .meta span{background:#fff;color:#000;border:1px solid #999;}
+    .actions,.notice,.progressbar,#quizForm{display:none !important;}
+    .card{box-shadow:none;break-inside:avoid;}
+    .opt:hover{background:#fcfdfe;}
+  }
+</style>
+</head>
+<body>
+<div class="progressbar" id="pbar"></div>
+
+<header class="top">
+  <div class="inner">
+    <h1>《人工智能工具使用规范》培训考试</h1>
+    <div class="meta">
+      <span>共 15 题</span>
+      <span>单选 8 · 多选 4 · 判断 3</span>
+      <span>满分 100 分</span>
+      <span>80 分及格</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="notice">
+    <b>答题说明</b>
+    <ol>
+      <li>单选题、判断题每题只有一个正确答案；多选题须选全对才得分，少选、多选、错选均不得分。</li>
+      <li>交卷后点击底部【交卷并查看成绩】自动出分并显示答案解析。</li>
+      <li>提交前请确认姓名已填写。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="who">
+      <label>姓名<input id="uName" placeholder="请输入姓名" autocomplete="off"></label>
+      <label>部门 / 机构<input id="uDept" placeholder="请输入部门" autocomplete="off"></label>
+    </div>
+  </div>
+
+  <form id="quizForm"></form>
+
+  <div class="actions" id="actions">
+    <button type="button" class="btn-main" id="submitBtn">交卷并查看成绩</button>
+    <button type="button" class="btn-ghost" id="resetBtn">重新答题</button>
+  </div>
+
+  <section id="result" class="result">
+    <div class="card scorebox">
+      <div class="num" id="scoreNum">0<small> 分</small></div>
+      <div class="badge" id="badge">—</div>
+      <div class="breakdown" id="breakdown"></div>
+    </div>
+    <div class="card" id="wrongReview" style="display:none;"></div>
+    <div class="card" style="padding:14px 18px;">
+      <details style="margin-bottom:10px;">
+        <summary style="cursor:pointer;font-size:12.5px;color:#14539a;">如需留底，可展开复制成绩文字</summary>
+        <pre id="record" style="margin:10px 0 0;padding:12px;background:#f7f9fc;border:1px solid #e2e6ec;border-radius:8px;font-size:12.5px;line-height:1.9;white-space:pre-wrap;font-family:inherit;color:#33414f;"></pre>
+      </details>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" class="btn-sub" id="copyBtn">复制成绩记录</button>
+        <button type="button" class="btn-sub" id="printBtn">打印 / 存为 PDF</button>
+      </div>
+    </div>
+    <div id="review"></div>
+  </section>
+
+  <div class="foot">
+    依据《员工人工智能工具使用规范 V1》· 培训考核专用<br>
+    执行中如遇具体问题，请向相关负责人咨询
+  </div>
+</div>
+
+<script>
+/* ===================== 题库（15 题） ===================== */
+const QUESTIONS = [
+  /* ---------- 一、单选题 8 题 × 6 分 = 48 ---------- */
+  {
+    id: 1, type: 'single', score: 6,
+    stem: '员工在非工作时间、非办公场所，使用个人手机与个人账号处理公司业务时，是否适用本规范？',
+    options: [
+      '不适用，本规范仅约束办公场所内的公司设备',
+      '仅试用期、实习人员适用',
+      '适用。凡处理公司事务，无论所处场所、使用设备与账号归属，均适用本规范',
+      '由员工自行决定是否遵守'
+    ],
+    answer: [2],
+    analysis: '本规范适用于全体员工（含试用、实习、外包及驻场人员），凡处理公司事务，无论场所、设备与账号归属均适用。',
+    basis: '第一章 前言 第2条；第十二章 常见问题第1问'
+  },
+  {
+    id: 2, type: 'single', score: 6,
+    stem: '有员工将含客户信息的材料粘贴给 AI，并要求工具"自行隐去姓名"。对此的正确认定是：',
+    options: [
+      '属于有效脱敏，可以接受',
+      '不构成脱敏。脱敏必须由员工在录入与提交前完成',
+      '只要工具不回传数据就没有风险',
+      '事后删除对话记录即可视为合规'
+    ],
+    answer: [1],
+    analysis: '"要求人工智能工具自行隐去姓名"等方式不构成脱敏，脱敏义务必须由员工在录入与提交前完成，提交行为一旦发生即已构成外传。',
+    basis: '第三章 严禁事项 第2条（二）'
+  },
+  {
+    id: 3, type: 'single', score: 6,
+    stem: '使用已准入工具处理 L2 级内部信息之前，还必须完成哪项处理？',
+    options: [
+      '无需任何处理，可直接提交',
+      '先行去除公司标识、印章及内部抬头',
+      '须经部门负责人书面同意',
+      '须经合规部门评估批准'
+    ],
+    answer: [1],
+    analysis: 'L2 内部信息可使用已准入工具，但须先行去除公司标识、印章及内部抬头。"经部门负责人同意"是 L3 级敏感信息在彻底脱敏后的要求，属于易混淆项。',
+    basis: '第四章 数据分级与使用对照 表 L2 行'
+  },
+  {
+    id: 4, type: 'single', score: 6,
+    stem: '员工已将提交给 AI 的本地对话记录全部删除，是否意味着风险与责任已消除？',
+    options: [
+      '是，记录删除后即视为未发生',
+      '否。是否构成违规，以录入或提交行为是否已经发生为准，与事后是否删除记录无关',
+      '删除后及时向负责人报备即可免责',
+      '只要不是故意为之即可免责'
+    ],
+    answer: [1],
+    analysis: '提交至外部 AI 工具的内容会上传至对方服务器存档且无法撤回。是否构成违规以提交行为是否发生为准，删除本地记录不影响违规认定。',
+    basis: '第一章 前言 第3条；第三章 第2条（三）；第十二章 第3问'
+  },
+  {
+    id: 5, type: 'single', score: 6,
+    stem: '员工应当使用人工智能工具的什么版本或来源？',
+    options: [
+      '任何能用的安装包，功能正常即可',
+      '第三方中转站点或镜像站点的破解版本',
+      '工具的官方正规版本（官方网站、官方应用），不得使用来源不明的安装包',
+      '同事转发分享的共享账号版本'
+    ],
+    answer: [2],
+    analysis: '应当使用工具的官方正规版本（官方网站、官方应用），严禁使用来源不明的安装包、第三方中转站点、镜像站点、共享账号及破解版本。',
+    basis: '第五章 可用工具范围 第3、4条'
+  },
+  {
+    id: 6, type: 'single', score: 6,
+    stem: '下列处理保单与理赔材料的做法中，符合规范的是：',
+    options: [
+      '将理赔材料截图后用 AI 识别整理',
+      '粘贴完整的客户信息表格，要求工具自动隐去姓名',
+      '由人工摘录要点后，仅就处理方法或文书格式向工具提问',
+      '先用翻译工具转换格式，再提交给 AI'
+    ],
+    answer: [2],
+    analysis: '摘录要点可以控制提交内容的范围；上传、截图、拍照原始文件会将整份材料交付第三方。借用翻译、格式转换、文字识别等工具间接提交，同样属于"任何方式"。',
+    basis: '第七章 操作规范对照 表；第三章 第2条（一）'
+  },
+  {
+    id: 7, type: 'single', score: 6,
+    stem: '某份材料的数据级别难以判定时，应当按照什么原则处理？',
+    options: [
+      '按最低级别处理，便于高效使用工具',
+      '按就高原则处理。凡涉及客户姓名、金额数据，或标注"内部""机密""未公开"字样的材料，一律按 L3 级以上处理',
+      '由经办员工自行判断并承担责任',
+      '一律禁止使用任何工具，无需判断'
+    ],
+    answer: [1],
+    analysis: '数据级别难以判定的按就高原则；涉及客户姓名、金额数据或标注"内部""机密""未公开"的材料，一律按 L3 级以上处理。',
+    basis: '第四章 数据分级与使用对照 第2条'
+  },
+  {
+    id: 8, type: 'single', score: 6,
+    stem: '智能体工具请求联网、调用外部接口或上传本地文件时，若所涉数据为 L2 级以上，应当如何处理？',
+    options: [
+      '可以先放行，事后向负责人报备',
+      '不得放行',
+      '由工具自动判断后决定',
+      '数据量不大时可以放行'
+    ],
+    answer: [1],
+    analysis: '智能体工具请求联网、调用外部接口或者上传本地文件时，应当先确认数据级别；涉及 L2 以上数据的，不得放行。',
+    basis: '第九章 智能体工具使用规范 第（五）项'
+  },
+
+  /* ---------- 二、多选题 4 题 × 10 分 = 40 ---------- */
+  {
+    id: 9, type: 'multi', score: 10,
+    stem: '下列哪些行为属于"以任何方式录入或提交至人工智能工具"？',
+    options: [
+      '复制粘贴文本内容',
+      '上传附件或原始文件',
+      '屏幕截图、拍照',
+      '语音录入',
+      '借用翻译、格式转换、文字识别等工具间接提交'
+    ],
+    answer: [0, 1, 2, 3, 4],
+    analysis: '"任何方式"包括复制粘贴、上传附件、屏幕截图、拍照、语音录入，以及借用翻译、格式转换、文字识别等工具间接提交。五项均属违规途径。',
+    basis: '第三章 严禁事项 第2条（一）'
+  },
+  {
+    id: 10, type: 'multi', score: 10,
+    stem: '根据《规范》，下列哪些属于严禁事项？',
+    options: [
+      '将客户姓名、证件号码、联系方式、保单及理赔材料录入或提交至 AI 工具',
+      '将客户名单、合作协议、未公开财务数据、人事与组织架构信息、董事会决议录入或提交至 AI 工具',
+      '以 AI 生成内容虚构、篡改或替代业务宣传材料、理赔申请材料中的事实性陈述',
+      '使用已准入工具对内部通知做文字润色（已去除公司标识）'
+    ],
+    answer: [0, 1, 2],
+    analysis: '三类严禁事项为：客户个人信息外传；商业信息、人事与组织架构信息及内部敏感资料外传；违规替代事实陈述与专业答复。D 项在去除公司标识后属于 L2 的合规用法，不在严禁之列。',
+    basis: '第三章 严禁事项 第1条 表'
+  },
+  {
+    id: 11, type: 'multi', score: 10,
+    stem: '关于智能体工具（如可读取本地目录、代为执行程序的编程助手与自动化工具），下列说法正确的有：',
+    options: [
+      '启用前应确认目录内不含 L3 级以上数据，存放客户信息、保单与理赔材料的目录不得授权访问',
+      '不得开放系统盘、共享盘、数据库目录、源代码仓库及含账号口令的配置目录',
+      '不得让其自动遍历、上传或者删除本机文件；代为执行批量操作前应确认操作范围与目标',
+      '经员工本人判断风险可控后，可自行开放客户信息目录以提升效率'
+    ],
+    answer: [0, 1, 2],
+    analysis: '智能体工具可直接访问终端文件与数据，风险高于对话式工具，须遵守第九条专项规定；存放客户信息、保单与理赔材料的目录一律不得授权访问，不存在"本人判断可自行开放"的例外。',
+    basis: '第九章 智能体工具使用规范 第（一）（二）（三）项'
+  },
+  {
+    id: 12, type: 'multi', score: 10,
+    stem: '关于人工智能生成内容的复核要求，下列说法正确的有：',
+    options: [
+      '生成内容在对外提供、向客户发送、纳入业务档案之前，必须经本人核实',
+      '涉及保险责任、免责条款、理赔标准、监管口径的内容，须经部门负责人或公司指定复核人员确认后方可对外提供',
+      '不得以内容由人工智能生成为由，免除或减轻经办人员的核实义务与责任',
+      '工具生成的保费试算与赔付金额可以直接发送给客户'
+    ],
+    answer: [0, 1, 2],
+    analysis: '生成内容必须先核实；涉责任、免责、理赔标准、监管口径的还须经负责人或指定人员确认；不得以"AI 生成"免责。保费试算、赔付金额须依据保险公司正式条款与口径核对无误后方可提供。',
+    basis: '第二章 基本原则 第3条；第十一章 生成内容的复核要求'
+  },
+
+  /* ---------- 三、判断题 3 题 × 4 分 = 12 ---------- */
+  {
+    id: 13, type: 'judge', score: 4,
+    stem: '只要工具已列入《人工智能工具正面清单》，就可以向其提交本规范保护范围内的数据。',
+    options: ['正确', '错误'],
+    answer: [1],
+    analysis: '错误。列入清单仅代表工具已通过适用性评估，并不意味着可以向其提交受本规范保护的数据；数据能否提交仍须按数据分级规定执行。',
+    basis: '第五章 可用工具范围 第2条'
+  },
+  {
+    id: 14, type: 'judge', score: 4,
+    stem: '通过个人即时通讯工具或手机拍照，先把公司材料传到个人设备，再使用 AI 工具处理，可以规避本规范的约束。',
+    options: ['正确', '错误'],
+    answer: [1],
+    analysis: '错误。将公司材料移转至个人设备后再行处理，同样受本规范约束，且会追究相关责任；不得以此规避数据范围的规定。',
+    basis: '第十章 第4条；第十二章 第5问'
+  },
+  {
+    id: 15, type: 'judge', score: 4,
+    stem: '监管数据报送及监管问询答复，AI 工具可用于资料整理、文字润色与格式编排，但不得用于形成事实陈述或专业答复。',
+    options: ['正确', '错误'],
+    answer: [0],
+    analysis: '正确。监管数据报送及监管问询答复属于限定应用场景，AI 仅可用于资料整理、文字润色与格式编排，事实、数据与结论须由经办人员依据原始材料或正式答复核实后确定。',
+    basis: '第八章 限定应用场景 第1条（四）、第2条'
+  }
+];
+
+const TOTAL = QUESTIONS.reduce((s, q) => s + q.score, 0);
+const PASS = 80;
+
+/* ===================== 渲染 ===================== */
+const form = document.getElementById('quizForm');
+const TYPE_CLASS = { single: '单选题', multi: '多选题', judge: '判断题' };
+const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+form.innerHTML = QUESTIONS.map((q, idx) => {
+  const inputType = q.type === 'multi' ? 'checkbox' : 'radio';
+  const opts = q.options.map((o, i) => `
+      <label class="opt" data-q="${q.id}" data-i="${i}">
+        <input type="${inputType}" name="q${q.id}" value="${i}" data-qid="${q.id}">
+        <span class="lab">${q.type === 'judge' ? '' : letters[i] + '.'}</span>
+        <span class="txt">${o}</span>
+      </label>`).join('');
+  return `
+  <div class="card q" id="card-${q.id}" data-qid="${q.id}">
+    <div class="qhead">
+      <div class="no">${idx + 1}</div>
+      <div>
+        <span class="tag">${TYPE_CLASS[q.type]} · ${q.score}分</span>
+        <div class="stem">${q.stem}</div>
+      </div>
+    </div>
+    <div class="opts">${opts}</div>
+  </div>`;
+}).join('');
+
+/* ===================== 交互 ===================== */
+let submitted = false;
+
+function refreshProgress() {
+  let done = 0;
+  QUESTIONS.forEach(q => {
+    if (form.querySelector(`input[name="q${q.id}"]:checked`)) done++;
+  });
+  document.getElementById('pbar').style.width = (done / QUESTIONS.length * 100) + '%';
+  return done;
+}
+
+form.addEventListener('change', e => {
+  if (submitted) return;
+  const qid = e.target.dataset.qid;
+  document.querySelectorAll(`.opt[data-q="${qid}"]`).forEach(el => el.classList.remove('checked'));
+  form.querySelectorAll(`input[name="q${qid}"]:checked`).forEach(inp => {
+    inp.closest('.opt').classList.add('checked');
+  });
+  refreshProgress();
+});
+
+/* ===================== 判分 ===================== */
+function grade() {
+  if (submitted) return;
+
+  // 提交前校验姓名
+  const nameInput = document.getElementById('uName');
+  const nameVal = nameInput.value.trim();
+  if (!nameVal) {
+    nameInput.focus();
+    nameInput.style.borderColor = '#c02b2b';
+    nameInput.style.background = '#fdecec';
+    alert('请先填写姓名后再交卷。');
+    nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const answered = refreshProgress();
+  if (answered < QUESTIONS.length) {
+    const left = QUESTIONS.length - answered;
+    if (!confirm(`还有 ${left} 题未作答，未作答按错误计分。确定交卷吗？`)) return;
+  }
+  submitted = true;
+
+  let got = 0;
+  const detail = { single: { g: 0, t: 0 }, multi: { g: 0, t: 0 }, judge: { g: 0, t: 0 } };
+
+  QUESTIONS.forEach(q => {
+    const picked = [...form.querySelectorAll(`input[name="q${q.id}"]:checked`)]
+      .map(i => Number(i.value)).sort((a, b) => a - b);
+    const correct = q.answer.slice().sort((a, b) => a - b);
+    const right = picked.length === correct.length && picked.every((v, i) => v === correct[i]);
+    if (right) { got += q.score; detail[q.type].g += q.score; }
+    detail[q.type].t += q.score;
+    renderReview(q, picked, correct, right);
+  });
+
+  // 锁定选项
+  form.querySelectorAll('input').forEach(i => i.disabled = true);
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'inline-block';
+
+  // 成绩面板
+  const pass = got >= PASS;
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('scoreNum').innerHTML = `${got}<small> 分</small>`;
+  document.getElementById('scoreNum').style.color = pass ? '#12855b' : '#c02b2b';
+  const badge = document.getElementById('badge');
+  badge.className = 'badge ' + (pass ? 'pass' : 'fail');
+  badge.textContent = pass ? '合格 · 培训通过' : `不合格 · 未达 ${PASS} 分，须补考`;
+
+  const cnt = QUESTIONS.length, rightCnt = QUESTIONS.filter(q => {
+    const picked = [...form.querySelectorAll(`input[name="q${q.id}"]:checked`)].map(i => Number(i.value)).sort((a, b) => a - b);
+    const c = q.answer.slice().sort((a, b) => a - b);
+    return picked.length === c.length && picked.every((v, i) => v === c[i]);
+  }).length;
+
+  document.getElementById('breakdown').innerHTML = `
+    <div>答对题数<b>${rightCnt} / ${cnt}</b></div>
+    <div>单选得分<b>${detail.single.g} / ${detail.single.t}</b></div>
+    <div>多选得分<b>${detail.multi.g} / ${detail.multi.t}</b></div>
+    <div>判断得分<b>${detail.judge.g} / ${detail.judge.t}</b></div>`;
+
+  renderWrongReview();
+
+  const name = document.getElementById('uName').value.trim();
+  const dept = document.getElementById('uDept').value.trim() || '（未填写）';
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('record').textContent =
+    `【《人工智能工具使用规范》培训考试】\n` +
+    `姓名：${name}　部门：${dept}\n` +
+    `得分：${got} / ${TOTAL}　结果：${pass ? '合格' : '不合格（须补考）'}\n` +
+    `答对：${rightCnt} / ${cnt} 题（单选 ${detail.single.g}/${detail.single.t}，多选 ${detail.multi.g}/${detail.multi.t}，判断 ${detail.judge.g}/${detail.judge.t}）\n` +
+    `交卷时间：${stamp}`;
+
+  // 自动上传成绩到后台（已移除：用户不再需要成绩后台）
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderReview(q, picked, correct, right) {
+  const card = document.getElementById('card-' + q.id);
+  if (!card) return;
+  card.querySelectorAll('.opt').forEach((el, i) => {
+    el.classList.remove('checked', 'right', 'wrong');
+    el.querySelector('input').style.pointerEvents = 'none';
+    if (correct.includes(i)) el.classList.add('right');
+    else if (picked.includes(i)) el.classList.add('wrong');
+    el.style.cursor = 'default';
+    if (picked.includes(i) && !correct.includes(i)) {}
+  });
+
+  const fmt = arr => arr.length ? arr.map(i => letters[i]).join('、') : '未作答';
+  const missed = correct.filter(i => !picked.includes(i)).map(i => letters[i]).join('、');
+  const extra = picked.filter(i => !correct.includes(i)).map(i => letters[i]).join('、');
+
+  let judgeLine = '';
+  if (q.type === 'judge') {
+    judgeLine = `<span class="judgeflag ${right ? 'ok' : 'no'}">${right ? '✓' : '✗'} 作答${right ? '正确' : '错误'}</span>`;
+  }
+  const div = document.createElement('div');
+  div.className = 'explain';
+  div.innerHTML =
+    `${judgeLine}` +
+    `<span class="${right ? 'k' : 'm'}">${right ? '✓ 回答正确' : '✗ 回答错误'}</span>` +
+    (right ? '' : `　你的答案：<b>${fmt(picked)}</b>　正确答案：<b>${fmt(correct)}</b>` +
+      (missed ? `　漏选：<b>${missed}</b>` : '') + (extra ? `　错选：<b>${extra}</b>` : '')) +
+    `<div style="margin-top:6px;">${q.analysis}</div>` +
+    `<span class="basis">依据：《规范》${q.basis}</span>`;
+  card.appendChild(div);
+}
+
+/* 错题解析集中展示在分数下方（仅答错的题） */
+function renderWrongReview() {
+  const box = document.getElementById('wrongReview');
+  const wrongs = [];
+
+  QUESTIONS.forEach((q, idx) => {
+    const picked = [...form.querySelectorAll(`input[name="q${q.id}"]:checked`)]
+      .map(i => Number(i.value)).sort((a, b) => a - b);
+    const correct = q.answer.slice().sort((a, b) => a - b);
+    const right = picked.length === correct.length && picked.every((v, i) => v === correct[i]);
+    if (!right) {
+      const fmt = arr => arr.length ? arr.map(i => letters[i]).join('、') : '未作答';
+      wrongs.push({ idx: idx + 1, stem: q.stem, picked: fmt(picked), correct: fmt(correct), analysis: q.analysis, basis: q.basis });
+    }
+  });
+
+  if (wrongs.length === 0) {
+    box.style.display = 'block';
+    box.innerHTML = `<div class="allright"><span class="ico">🎉</span>全部答对，太棒了！没有需要订正的题目。</div>`;
+    return;
+  }
+
+  const items = wrongs.map(w => `
+    <div class="wrongitem">
+      <div class="qhead"><span class="qno">第 ${w.idx} 题</span>${w.stem}</div>
+      <div class="ans">你的答案：<b class="you">${w.picked}</b>　正确答案：<b class="ok">${w.correct}</b></div>
+      <div class="ana">${w.analysis}</div>
+      <span class="basis">依据：《规范》${w.basis}</span>
+    </div>`).join('');
+
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div class="wrongtitle">📝 错题解析 <span class="cnt">${wrongs.length} 题</span></div>
+    ${items}`;
+}
+
+/* ===================== 按钮 ===================== */
+document.getElementById('submitBtn').addEventListener('click', () => grade());
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (!confirm('确定重新答题吗？当前成绩与作答将被清除。')) return;
+  location.reload();
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const txt = document.getElementById('record').textContent;
+  try {
+    await navigator.clipboard.writeText(txt);
+    alert('已复制成绩记录，请粘贴到企业微信发给培训组织人。');
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+    alert('已复制成绩记录。');
+  }
+});
+
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+/* ===================== 启动 ===================== */
+refreshProgress();
+
+// 姓名填写后清除错误提示样式
+document.getElementById('uName').addEventListener('input', e => {
+  if (e.target.value.trim()) {
+    e.target.style.borderColor = '';
+    e.target.style.background = '';
+  }
+});
+
+window.addEventListener('beforeunload', e => {
+  if (!submitted) { e.preventDefault(); e.returnValue = ''; }
+});
+</script>
+</body>
+</html>
