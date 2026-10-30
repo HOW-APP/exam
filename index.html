@@ -77,6 +77,12 @@
   /* 结果 */
   .result{display:none;}
   .scorebox{text-align:center;padding:26px 20px;}
+  .scorebox .who-line{
+    font-size:14.5px;color:var(--sub);margin-bottom:12px;
+    display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+  }
+  .scorebox .who-line b{color:var(--ink);font-size:16px;font-weight:700;}
+  .scorebox .who-line .sep{color:#c9d3df;}
   .scorebox .num{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.02em;}
   .scorebox .num small{font-size:16px;font-weight:600;color:var(--sub);}
   .badge{display:inline-block;margin-top:12px;padding:5px 18px;border-radius:999px;font-weight:700;font-size:14px;}
@@ -181,6 +187,7 @@
 
   <section id="result" class="result">
     <div class="card scorebox">
+      <div class="who-line" id="whoLine"></div>
       <div class="num" id="scoreNum">0<small> 分</small></div>
       <div class="badge" id="badge">—</div>
       <div class="breakdown" id="breakdown"></div>
@@ -491,6 +498,15 @@ function grade() {
   // 成绩面板
   const pass = got >= PASS;
   document.getElementById('result').style.display = 'block';
+
+  // 显示答题人姓名与部门
+  const nameTxt = document.getElementById('uName').value.trim();
+  const deptTxt = document.getElementById('uDept').value.trim();
+  const whoLine = document.getElementById('whoLine');
+  whoLine.innerHTML =
+    `<span>答题人：<b>${nameTxt}</b></span>` +
+    (deptTxt ? `<span class="sep">|</span><span>部门：<b>${deptTxt}</b></span>` : '');
+
   document.getElementById('scoreNum').innerHTML = `${got}<small> 分</small>`;
   document.getElementById('scoreNum').style.color = pass ? '#12855b' : '#c02b2b';
   const badge = document.getElementById('badge');
